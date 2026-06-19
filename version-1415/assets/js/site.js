@@ -1,0 +1,12 @@
+(function(){
+var q=function(s,p){return(p||document).querySelector(s)};
+var qa=function(s,p){return Array.prototype.slice.call((p||document).querySelectorAll(s))};
+var toggle=q('.menu-toggle'),panel=q('.mobile-panel');
+if(toggle&&panel){toggle.addEventListener('click',function(){panel.classList.toggle('is-open')})}
+var slides=qa('.hero-slide'),dots=qa('.hero-dots button'),idx=0,timer=null;
+function show(n){if(!slides.length)return;idx=(n+slides.length)%slides.length;slides.forEach(function(s,i){s.classList.toggle('is-active',i===idx)});dots.forEach(function(d,i){d.classList.toggle('is-active',i===idx)})}
+if(slides.length){dots.forEach(function(d,i){d.addEventListener('click',function(){show(i);restart()})});function restart(){if(timer)clearInterval(timer);timer=setInterval(function(){show(idx+1)},5200)};show(0);restart()}
+var panelFilter=q('[data-filter-panel]');
+if(panelFilter){var input=q('[data-search]',panelFilter),year=q('[data-year-filter]',panelFilter),cat=q('[data-cat-filter]',panelFilter),cards=qa('.searchable-card'),empty=q('.empty-state');function run(){var kw=(input&&input.value||'').trim().toLowerCase(),yv=year&&year.value||'',cv=cat&&cat.value||'',seen=0;cards.forEach(function(c){var text=(c.getAttribute('data-text')||''),cy=c.getAttribute('data-year')||'',cc=c.getAttribute('data-cat')||'';var ok=(!kw||text.indexOf(kw)>-1)&&(!yv||cy===yv)&&(!cv||cc===cv);c.classList.toggle('no-match',!ok);if(ok)seen++});if(empty)empty.classList.toggle('is-visible',seen===0)};[input,year,cat].forEach(function(el){if(el)el.addEventListener('input',run);if(el)el.addEventListener('change',run)});run()}
+window.SitePlayer={init:function(src){var video=q('#moviePlayer'),btn=q('#playerButton'),loaded=false;if(!video||!src)return;function load(){if(loaded)return;loaded=true;if(window.Hls&&window.Hls.isSupported()){var hls=new Hls({enableWorker:true,lowLatencyMode:true});hls.loadSource(src);hls.attachMedia(video)}else{video.src=src}}function play(){load();var p=video.play();if(p&&p.catch){p.catch(function(){})}if(btn)btn.classList.add('is-hidden')}if(btn)btn.addEventListener('click',play);video.addEventListener('click',function(){if(video.paused){play()}else{video.pause();if(btn)btn.classList.remove('is-hidden')}});video.addEventListener('play',function(){if(btn)btn.classList.add('is-hidden')});video.addEventListener('pause',function(){if(btn)btn.classList.remove('is-hidden')})}}
+})();
